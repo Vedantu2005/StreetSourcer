@@ -1,5 +1,12 @@
+Of course. Here is the updated README.md file, now including the live deployment link.
+
 StreetFood Source - Vendor & Supplier Platform 🚀
 A web platform connecting local street food vendors with trusted suppliers for quality raw materials. This project provides a seamless interface for vendors to browse products and place orders, and a comprehensive dashboard for suppliers to manage their inventory and incoming requests.
+
+🌐 Live Demo
+You can view the live deployed project here:
+
+https://moonlit-concha-11cf93.netlify.app/
 
 ✨ Core Features
 This platform is divided into two main user roles, each with its own set of powerful features.
@@ -63,19 +70,7 @@ Copy the firebaseConfig object provided.
 
 Update Firebase Configuration:
 
-In each of the following files, replace the placeholder firebaseConfig object with the one you just copied from your Firebase project:
-
-addproducts.html
-
-freshkart.html
-
-supplier-dashboard.html
-
-supplier-login.html
-
-history.html
-
-greenleaf-farms.html
+In each of the relevant files, replace the placeholder firebaseConfig object with the one you just copied from your Firebase project.
 
 Configure Firebase Services:
 

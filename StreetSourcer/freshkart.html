@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- ✅ CHANGED: Updated title -->
+  <title>FreshKart</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <style>
+    body { background-color: #f8f9fa; }
+    .card:hover { box-shadow: 0 0 10px rgba(0,0,0,0.2); cursor: pointer; }
+    .hover-effect { transition: all 0.3s ease; }
+    .hover-effect:hover { color: #ffc107 !important; text-decoration: underline; }
+    .navbar-brand { font-size: 1.4rem; }
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold text-warning" href="#">🌟 Vendor Panel</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarVendor">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-end" id="navbarVendor">
+      <ul class="navbar-nav mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link text-white fw-semibold hover-effect" href="history.html">Orders</a></li>
+        <li class="nav-item"><a class="nav-link text-danger fw-semibold hover-effect" id="logoutBtn" href="#">Logout</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+<div class="container mt-4">
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <input type="text" id="searchInput" class="form-control" placeholder="Search Product...">
+    </div>
+    <div class="col-md-6 text-end">
+      <select id="filterSelect" class="form-select d-inline w-auto">
+        <option value="default">Sort By</option>
+        <option value="low">Price: Low to High</option>
+        <option value="high">Price: High to Low</option>
+      </select>
+    </div>
+  </div>
+
+<div class="container mt-4">
+  <!-- ✅ CHANGED: Updated heading -->
+  
+  <div id="product-container" class="d-flex flex-wrap justify-content-start">
+    <div class="col-12 text-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="text-muted mt-2">Loading products...</p>
+    </div>
+  </div>
+</div>
+
+<!-- Order Modal (No changes needed here) -->
+<div class="modal fade" id="orderModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="orderForm" onsubmit="event.preventDefault(); submitOrder();">
+        <div class="modal-header">
+          <h5 class="modal-title">Place Order</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="modalSupplierEmail" />
+          <input type="hidden" id="modalSupplierName" />
+          <div class="mb-3"><label>Product</label><input type="text" id="modalProduct" class="form-control" readonly></div>
+          <div class="mb-3"><label>Quantity (kg)</label><input type="number" class="form-control" id="modalQuantity" required></div>
+          <div class="mb-3"><label>Delivery Location</label><input type="text" class="form-control" id="modalLocation" placeholder="Your delivery address"></div>
+          <div class="mb-3"><label>Payment Mode</label><select class="form-select" id="modalPayment"><option>Cash on Delivery</option><option>UPI</option></select></div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Submit Order</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+  <div id="successToast" class="toast align-items-center text-bg-success border-0" role="alert">
+    <div class="d-flex">
+      <div class="toast-body">Order placed successfully!</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAYHdIkhYD0az_6D6awMUTAb40WctEmGCY",
+    authDomain: "street-sourcer.firebaseapp.com",
+    projectId: "street-sourcer",
+    storageBucket: "street-sourcer.appspot.com",
+    messagingSenderId: "15894964108",
+    appId: "1:15894964108:web:a97b17e9f6ef26552b18a9"
+  };
+
+  const app = firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const auth = firebase.auth();
+
+  const orderModal = new bootstrap.Modal(document.getElementById('orderModal'));
+  const toast = new bootstrap.Toast(document.getElementById('successToast'));
+
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      fetchProducts();
+    } else {
+      window.location.href = "vendor-login.html";
+    }
+  });
+
+  function fetchProducts() {
+    const productContainer = document.getElementById("product-container");
+    
+    
+    db.collection("products")
+      .where("supplierEmail", "==", "freshkart@gmail.com")
+      .orderBy("name")
+      .onSnapshot((querySnapshot) => {
+        productContainer.innerHTML = "";
+        if (querySnapshot.empty) {
+          productContainer.innerHTML = `<p class="text-muted">No products are currently available from this supplier.</p>`;
+          return;
+        }
+        
+        querySnapshot.forEach((doc) => {
+          const product = doc.data();
+          const card = document.createElement("div");
+          card.className = "card m-2";
+          card.style.width = "18rem";
+          card.innerHTML = `
+            <img src="${product.imageUrl}" class="card-img-top" alt="${product.name}" style="height: 200px; object-fit: cover;">
+            <div class="card-body">
+              <h5 class="card-title">${product.name}</h5>
+              <p class="card-text">₹${product.price}/kg · ${product.stock} kg in stock</p>
+              <button class="btn btn-primary" onclick="openOrderModal('${product.name}', '${product.supplierName}', '${product.supplierEmail}')">Order Now</button>
+            </div>
+          `;
+          productContainer.appendChild(card);
+        });
+      }, (error) => {
+        console.error("Error fetching products: ", error);
+        productContainer.innerHTML = `<p class="text-danger">There was an error loading products. Please try again.</p>`;
+      });
+  }
+
+  function openOrderModal(productName, supplierName, supplierEmail) {
+    document.getElementById('modalProduct').value = productName;
+    document.getElementById('modalSupplierName').value = supplierName;
+    document.getElementById('modalSupplierEmail').value = supplierEmail;
+    orderModal.show();
+  }
+
+  function submitOrder() {
+    const user = auth.currentUser;
+    
+    const orderData = {
+      product: document.getElementById('modalProduct').value,
+      supplier: document.getElementById('modalSupplierName').value,
+      supplierEmail: document.getElementById('modalSupplierEmail').value,
+      quantity: document.getElementById('modalQuantity').value,
+      location: document.getElementById('modalLocation').value,
+      payment: document.getElementById('modalPayment').value,
+      status: "Pending",
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      vendorId: user.uid,
+      vendorEmail: user.email,
+    };
+
+    db.collection('orders').add(orderData)
+      .then(() => {
+        orderModal.hide();
+        toast.show();
+      })
+      .catch((error) => {
+        console.error("Error writing order:", error);
+        alert("Error placing order: " + error.message);
+      });
+  }
+
+  document.getElementById("logoutBtn").addEventListener("click", (e) => {
+    e.preventDefault();
+    auth.signOut().then(() => window.location.href = "index.html");
+  });
+</script>
+
+</body>
+</html>

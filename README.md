@@ -6,7 +6,7 @@ A web platform connecting local street food vendors with trusted suppliers for q
 🌐 Live Demo
 You can view the live deployed project here:
 
-https://moonlit-concha-11cf93.netlify.app/
+https://whimsical-sable-a79469.netlify.app/
 
 ✨ Core Features
 This platform is divided into two main user roles, each with its own set of powerful features.

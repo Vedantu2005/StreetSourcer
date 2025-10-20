@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Supplier Login | Travolic</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Firebase SDK (modular) -->
+  <script type="module" src="supplier-login.js"></script>
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #1a73e8, #0d47a1);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card {
+      background: #fff;
+      border-radius: 1rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      overflow: hidden;
+      width: 380px;
+      padding: 2rem;
+      transition: all 0.4s ease;
+    }
+    .toggle {
+      color: #1a73e8;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .google-btn {
+      background: #fff;
+      border: 1px solid #ddd;
+      padding: 0.7rem;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 10px;
+    }
+    .google-btn:hover {
+      background: #f8f8f8;
+    }
+    .google-btn img {
+      width: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h2 class="text-2xl font-semibold text-center mb-5">Supplier Portal</h2>
+
+    <!-- Login Form -->
+    <div id="loginForm">
+      <input type="email" id="loginEmail" placeholder="Email" class="w-full p-3 border border-gray-300 rounded-lg mb-3" required>
+      <input type="password" id="loginPassword" placeholder="Password" class="w-full p-3 border border-gray-300 rounded-lg mb-3" required>
+
+      <button id="loginBtnEmail" class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition">Login</button>
+
+      <p class="text-center text-sm text-gray-600 mt-2">
+        <span id="forgotPasswordLink" class="toggle">Forgot password?</span>
+      </p>
+
+      <div id="googleLogin" class="google-btn">
+        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google"> 
+        Login with Google
+      </div>
+
+      <p class="text-center mt-4 text-sm text-gray-600">
+        Don’t have an account? <span class="toggle" id="showSignup">Signup</span>
+      </p>
+    </div>
+
+    <!-- Signup Form -->
+    <div id="signupForm" style="display:none;">
+      <input type="email" id="signupEmail" placeholder="Email" class="w-full p-3 border border-gray-300 rounded-lg mb-3" required>
+      <input type="password" id="signupPassword" placeholder="Password" class="w-full p-3 border border-gray-300 rounded-lg mb-3" required>
+      <input type="password" id="confirmPassword" placeholder="Confirm Password" class="w-full p-3 border border-gray-300 rounded-lg mb-3" required>
+
+      <button id="signupBtnEmail" class="w-full bg-green-600 text-white font-semibold py-2 rounded-lg hover:bg-green-700 transition">Signup</button>
+
+      <p class="text-center mt-4 text-sm text-gray-600">
+        Already have an account? <span class="toggle" id="showLogin">Login</span>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // Toggle Forms
+    const loginFormDiv = document.getElementById("loginForm");
+    const signupFormDiv = document.getElementById("signupForm");
+    document.getElementById("showSignup").addEventListener("click", () => {
+      loginFormDiv.style.display = "none";
+      signupFormDiv.style.display = "block";
+    });
+    document.getElementById("showLogin").addEventListener("click", () => {
+      signupFormDiv.style.display = "none";
+      loginFormDiv.style.display = "block";
+    });
+  </script>
+</body>
+</html>
